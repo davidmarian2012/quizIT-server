@@ -11,8 +11,9 @@ app.use(cors());
 app.use(express.json());
 app.use(bodyParser.urlencoded({extended: false}));
 
+
 const db = new Database();
-db.connect();
+db.connect(); 
 
 app.get('/', (req, res) => {
     res.send('Server is running');
