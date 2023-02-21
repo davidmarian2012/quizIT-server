@@ -4,6 +4,7 @@ import cors from 'cors';
 import { Database } from './dbConnection.js';
 
 import UserRoutes from './routes/userRoutes.js';
+import MessageRoutes from './routes/messageRoutes.js';
 
 const app = express();
 
@@ -20,6 +21,7 @@ app.get('/', (req, res) => {
 })
 
 app.use('/user', UserRoutes);
+app.use('/message', MessageRoutes)
 
 const port = 8080;
 app.listen(port, () => console.log(`Backend application listening at http://localhost:${port}`));
