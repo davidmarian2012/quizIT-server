@@ -20,6 +20,9 @@ const userSchema = mongoose.Schema({
             required: true,
             minLength: 3
         },
+        points: {
+            type: Number
+        }
     },
     {
         toJSON: {virtuals: true},

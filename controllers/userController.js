@@ -7,6 +7,7 @@ const UserController = {
     create: (req, res) => {
         const userInput = req.body;
         userInput._id = mongoose.Types.ObjectId();
+        userInput.points = 0;
 
         const newUser = new User(userInput);
         newUser.save().then(() => {
