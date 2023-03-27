@@ -2,6 +2,8 @@ import User from "../schemas/userSchema.js";
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import HttpStatus from "../enums/HttpStatusEnum.js";
+import jsonwebtoken from 'jsonwebtoken';
+import logger from '../services/logger.js';
 
 const UserController = {
     create: (req, res) => {
@@ -21,14 +23,27 @@ const UserController = {
     login: async (req, res) => {
         try{
             let user = await User.findOne({username: req.body.username});
-            if (!user) return res.status(HttpStatus.NotFound).send('Invalid username/password');
+            if (!user) return res.status(HttpStatus.Unauthorized).send('Invalid username/password');
 
             const validPass = await bcrypt.compare(req.body.password, user.password);
-            if (!validPass) return res.status(HttpStatus.NotFound).send('Invalid username/password');
+            if (!validPass) return res.status(HttpStatus.Unauthorized).send('Invalid username/password');
 
-            return res.status(HttpStatus.Ok).send('Login was successfull');
+            let response = {
+                id: user._id,
+                username: user.username,
+            }
+
+            const jwtKey = process.env.JWT_SECRET_KEY || 'secret_key'
+            const token = jsonwebtoken.sign(
+                {user: response},
+                jwtKey,
+                {algorithm: 'HS256'}
+            )
+
+            return res.status(HttpStatus.Ok).json({token: token})
         }
         catch(error){
+            logger.error(error.message);
             res.status(HttpStatus.ServerError).json({message: error.message});
         }
     }
