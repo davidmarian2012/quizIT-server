@@ -20,7 +20,7 @@ const MessageController = {
     getAll: async (req, res) => {
         try{
             let messages = await MessageSchema.find();
-            res.status(HttpStatus.Ok).json({messages: messages});
+            return res.status(HttpStatus.Ok).json(messages);
         } catch (error){
             res.status(HttpStatus.ServerError).json({message: error.message});
         }
