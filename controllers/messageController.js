@@ -1,7 +1,6 @@
 import Message from "../schemas/messageSchema.js";
 import mongoose from "mongoose";
 import HttpStatus from "../enums/HttpStatusEnum.js";
-import MessageSchema from "../schemas/messageSchema.js";
 
 const MessageController = {
     create: (req, res) => {
@@ -19,7 +18,7 @@ const MessageController = {
 
     getAll: async (req, res) => {
         try{
-            let messages = await MessageSchema.find();
+            let messages = await Message.find();
             return res.status(HttpStatus.Ok).json(messages);
         } catch (error){
             res.status(HttpStatus.ServerError).json({message: error.message});

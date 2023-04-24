@@ -5,6 +5,8 @@ import { Database } from './dbConnection.js';
 
 import UserRoutes from './routes/userRoutes.js';
 import MessageRoutes from './routes/messageRoutes.js';
+import MultiQuestionRoutes from './routes/multiQuestionRoutes.js';
+import NumericalQuestionRoutes from './routes/numericalQuestionRoutes.js';
 
 const app = express();
 
@@ -22,6 +24,8 @@ app.get('/', (req, res) => {
 
 app.use('/user', UserRoutes);
 app.use('/message', MessageRoutes)
+app.use('/multiquestion', MultiQuestionRoutes)
+app.use('/numericalquestion', NumericalQuestionRoutes)
 
 const port = 8080;
 app.listen(port, () => console.log(`Backend application listening at http://localhost:${port}`));
