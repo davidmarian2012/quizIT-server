@@ -18,7 +18,7 @@ const MessageController = {
 
     getAll: async (req, res) => {
         try{
-            let messages = await Message.find();
+            let messages = await Message.find().sort({createdAt: 'desc'});
             return res.status(HttpStatus.Ok).json(messages);
         } catch (error){
             res.status(HttpStatus.ServerError).json({message: error.message});

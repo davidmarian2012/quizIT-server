@@ -46,6 +46,31 @@ const UserController = {
             logger.error(error.message);
             res.status(HttpStatus.ServerError).json({message: error.message});
         }
+    },
+
+    getAll: async (req, res) => {
+        try{
+            let users = await User.find();
+            return res.status(HttpStatus.Ok).json(users);
+        } catch (error){
+            res.status(HttpStatus.ServerError).json({message: error.message});
+        }
+    },
+
+    getUserByUsername: async (req, res) => {
+        try{
+            let user = await User.findOne({
+                username: req.body.username
+            });
+
+            if(user){
+                res.status(HttpStatus.Ok).json(user);
+            }
+            res.status(HttpStatus.Ok).json();
+        } catch (error){
+            logger.error(error.message);
+            res.status(HttpStatus.ServerError).json({message: error.message});
+        }
     }
 }
 
