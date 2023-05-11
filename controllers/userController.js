@@ -57,6 +57,15 @@ const UserController = {
         }
     },
 
+    getAllByPoints: async (req, res) => {
+        try{
+            let users = await User.find().sort({points: 'desc'});
+            return res.status(HttpStatus.Ok).json(users);
+        } catch (error){
+            res.status(HttpStatus.ServerError).json({message: error.message});
+        }
+    },
+
     getUserByUsername: async (req, res) => {
         try{
             let user = await User.findOne({
@@ -69,6 +78,23 @@ const UserController = {
             res.status(HttpStatus.Ok).json();
         } catch (error){
             logger.error(error.message);
+            res.status(HttpStatus.ServerError).json({message: error.message});
+        }
+    },
+
+    upload: async (req, res) => {
+        try{
+            const user = await User.findOne({
+                username: req.body.username
+            });
+
+            if(user){
+                user.avatar = req.file.filename;
+                await user.save();
+                res.status(HttpStatus.Ok).json({message: 'Avatar uploaded successfully!'});
+            } 
+
+        } catch (error){
             res.status(HttpStatus.ServerError).json({message: error.message});
         }
     }

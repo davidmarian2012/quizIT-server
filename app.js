@@ -13,7 +13,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(bodyParser.urlencoded({extended: false}));
-
+app.use('/avatar', express.static('avatar'));
 
 const db = new Database();
 db.connect(); 
