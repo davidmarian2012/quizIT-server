@@ -97,7 +97,41 @@ const UserController = {
         } catch (error){
             res.status(HttpStatus.ServerError).json({message: error.message});
         }
-    }
+    },
+
+    removeAvatar: async (req, res) => {
+        try{
+            const user = await User.findOne({
+                username: req.body.username
+            });
+
+            if(user){
+                user.avatar = 'avatar.png';
+                await user.save();
+                res.status(HttpStatus.Ok).json({message: 'Avatar removed successfully!'});
+            } 
+
+        } catch (error){
+            res.status(HttpStatus.ServerError).json({message: error.message});
+        }
+    },
+
+    updatePoints: async (req, res) => {
+        try{
+            const user = await User.findOne({
+                username: req.body.username
+            });
+
+            if(user){
+                user.points += req.body.earnedPoints;
+                await user.save();
+                res.status(HttpStatus.Ok).json({message: 'Points updated successfully!'});
+            } 
+
+        } catch (error){
+            res.status(HttpStatus.ServerError).json({message: error.message});
+        }
+    },
 }
 
 export default UserController;

@@ -34,6 +34,14 @@ app.post('/upload', upload.single("avatar"), async (req, res) => {
     await UserController.upload(req, res);
 })
 
+app.post('/removeAvatar', async (req, res) => {
+    await UserController.removeAvatar(req, res);
+})
+
+app.post('/update', async (req, res) => {
+    await UserController.updatePoints(req, res);
+})
+
 app.get('/', async(req, res) => {
     await UserController.getAll(req, res);
 })
