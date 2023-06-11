@@ -4,6 +4,16 @@ import bcrypt from "bcrypt";
 import HttpStatus from "../enums/HttpStatusEnum.js";
 import jsonwebtoken from "jsonwebtoken";
 import logger from "../services/logger.js";
+import nodemailer from "nodemailer";
+import crypto from "crypto";
+
+const transporter = nodemailer.createTransport({
+  service: "hotmail",
+  auth: {
+    user: "quizit2023_3@hotmail.com",
+    pass: "quizit123",
+  },
+});
 
 const UserController = {
   create: (req, res) => {
@@ -11,10 +21,31 @@ const UserController = {
     userInput._id = mongoose.Types.ObjectId();
     userInput.points = 0;
 
+    const activationToken = crypto.randomBytes(20).toString("hex");
+
     const newUser = new User(userInput);
+    newUser.isActive = false;
+    newUser.activationToken = activationToken;
     newUser
       .save()
       .then(() => {
+        const activationLink = `http://localhost:8080/user/${activationToken}`;
+
+        const mailOptions = {
+          from: "quizit2023_3@hotmail.com",
+          to: newUser.email,
+          subject: "QUIZIT Account Confirmation",
+          text: `<p>Thank you for signing up. To activate your account, click the following link:</p>
+          <a href="${activationLink}">${activationLink}</a>`,
+        };
+
+        transporter.sendMail(mailOptions, (error, info) => {
+          if (error) {
+            console.error("Error sending email ", error);
+          } else {
+            console.log("Email sent ", info.response);
+          }
+        });
         res
           .status(HttpStatus.Created)
           .send({ username: newUser.username, success: true });
@@ -22,6 +53,31 @@ const UserController = {
       .catch((error) => {
         res.status(HttpStatus.ServerError).json({ message: error.message });
       });
+  },
+
+  activate: async (req, res) => {
+    try {
+      const activationToken = req.params.activationToken;
+      const user = await User.findOne({
+        activationToken: activationToken,
+      });
+
+      if (!user) {
+        return res.status(HttpStatus.Unauthorized).send("Invalid token");
+      }
+
+      user.isActive = true;
+      user.activationToken = null;
+      await user.save();
+
+      return res
+        .status(HttpStatus.Ok)
+        .json({ message: "User activated successfully" });
+    } catch {
+      (error) => {
+        res.status(HttpStatus.ServerError).json({ message: error.message });
+      };
+    }
   },
 
   login: async (req, res) => {
@@ -37,6 +93,9 @@ const UserController = {
         return res
           .status(HttpStatus.Unauthorized)
           .send("Invalid username/password");
+
+      if (!user.isActive)
+        return res.status(HttpStatus.Unauthorized).send("User not confirmed");
 
       let response = {
         id: user._id,

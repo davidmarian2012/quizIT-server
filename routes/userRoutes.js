@@ -69,4 +69,8 @@ app.post("/resetpassword", async (req, res) => {
   await UserController.resetPassword(req, res);
 });
 
+app.get("/:activationToken", async (req, res) => {
+  await UserController.activate(req, res);
+});
+
 export default app;
