@@ -10,7 +10,7 @@ import crypto from "crypto";
 const transporter = nodemailer.createTransport({
   service: "hotmail",
   auth: {
-    user: "quizit2023_3@hotmail.com",
+    user: "quizit2023_4@hotmail.com",
     pass: "quizit123",
   },
 });
@@ -32,7 +32,7 @@ const UserController = {
         const activationLink = `http://localhost:8080/user/${activationToken}`;
 
         const mailOptions = {
-          from: "quizit2023_3@hotmail.com",
+          from: "quizit2023_4@hotmail.com",
           to: newUser.email,
           subject: "QUIZIT Account Confirmation",
           text: `<p>Thank you for signing up. To activate your account, click the following link:</p>
@@ -53,6 +53,87 @@ const UserController = {
       .catch((error) => {
         res.status(HttpStatus.ServerError).json({ message: error.message });
       });
+  },
+
+  forgotPassword: async (req, res) => {
+    try {
+      const email = req.body.email;
+      const user = await User.findOne({ email: email });
+
+      if (!user) {
+        return res.status(HttpStatus.NotFound).send("User not found");
+      }
+
+      const resetToken = crypto.randomBytes(20).toString("hex");
+      user.resetToken = resetToken;
+      await user.save();
+
+      const resetLink = `http://localhost:8080/user/reset-password/${resetToken}`;
+      const mailOptions = {
+        from: "quizit2023_4@hotmail.com",
+        to: user.email,
+        subject: "QUIZIT Password Reset",
+        text: `<p>You have requested to reset your password. Click the following link to reset your password:</p>
+        <a href="${resetLink}">${resetLink}</a>`,
+      };
+
+      transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+          console.error("Error sending email ", error);
+          return res
+            .status(HttpStatus.ServerError)
+            .send("Failed to send email");
+        } else {
+          console.log("Email sent ", info.response);
+          return res
+            .status(HttpStatus.Ok)
+            .send("Password reset email sent successfully");
+        }
+      });
+    } catch (error) {
+      console.error("Error in forgot password ", error);
+      res.status(HttpStatus.ServerError).json({ message: error.message });
+    }
+  },
+
+  showResetPasswordForm: async (req, res) => {
+    try {
+      const resetToken = req.params.resetToken;
+
+      const user = await User.findOne({ resetToken });
+
+      if (!user) {
+        return res.status(HttpStatus.Unauthorized).send("Invalid reset token");
+      }
+
+      return res.render("../views/reset-password", { resetToken });
+    } catch (error) {
+      console.error("Error in showResetPasswordForm ", error);
+      res.status(HttpStatus.ServerError).json({ message: error.message });
+    }
+  },
+
+  resetPasswordToken: async (req, res) => {
+    try {
+      const resetToken = req.params.resetToken;
+      const { password } = req.body;
+
+      const user = await User.findOne({ resetToken: resetToken });
+
+      if (!user) {
+        return res.status(HttpStatus.Unauthorized).send("Invalid reset token");
+      }
+
+      user.password = password;
+      user.resetToken = null;
+
+      await user.save();
+
+      return res.status(HttpStatus.Ok).send("Password reset successfully");
+    } catch (error) {
+      console.error("Error in resetPassword ", error);
+      res.status(HttpStatus.ServerError).json({ message: error.message });
+    }
   },
 
   activate: async (req, res) => {
