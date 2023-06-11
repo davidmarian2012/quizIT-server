@@ -31,6 +31,9 @@ const userSchema = mongoose.Schema(
     activationToken: {
       type: String,
     },
+    resetToken: {
+      type: String,
+    },
     isActive: {
       type: Boolean,
     },
