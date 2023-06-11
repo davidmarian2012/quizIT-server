@@ -11,4 +11,8 @@ app.post('/', async(req, res) => {
     MessageController.create(req, res);
 })
 
+app.delete('/:id', async(req, res) => {
+    await MessageController.delete(req, res);
+})
+
 export default app;
