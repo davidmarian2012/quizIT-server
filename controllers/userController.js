@@ -35,8 +35,7 @@ const UserController = {
           from: "quizit2023_4@hotmail.com",
           to: newUser.email,
           subject: "QUIZIT Account Confirmation",
-          text: `<p>Thank you for signing up. To activate your account, click the following link:</p>
-          <a href="${activationLink}">${activationLink}</a>`,
+          text: `Thank you for signing up. To activate your QUIZIT account, click the following link: ${activationLink}`,
         };
 
         transporter.sendMail(mailOptions, (error, info) => {
@@ -73,8 +72,7 @@ const UserController = {
         from: "quizit2023_4@hotmail.com",
         to: user.email,
         subject: "QUIZIT Password Reset",
-        text: `<p>You have requested to reset your password. Click the following link to reset your password:</p>
-        <a href="${resetLink}">${resetLink}</a>`,
+        text: `You have requested to reset your QUIZIT password. Click the following link to reset your password: ${resetLink}`,
       };
 
       transporter.sendMail(mailOptions, (error, info) => {
